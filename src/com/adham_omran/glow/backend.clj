@@ -1,8 +1,8 @@
-(ns com.adham-omran.shiny.backend
+(ns com.adham-omran.glow.backend
   (:require
    [cheshire.core :as json]
    [clojure.pprint :as pprint]
-   [com.adham-omran.shiny.pages :as pages]
+   [com.adham-omran.glow.pages :as pages]
    [hiccup2.core :as h]
    [muuntaja.core :as m]
    [reitit.coercion.malli]

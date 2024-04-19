@@ -1,8 +1,9 @@
-(ns com.adham-omran.shiny.pages
+(ns com.adham-omran.glow.pages
   (:require
    [cheshire.core :as json]
    [hiccup.page :as page]
    [hiccup2.core :as h]
+   [tablecloth.api :as tc]
    [scicloj.kindly.v4.kind :as kind]))
 
 (defn index-page
@@ -11,7 +12,7 @@
    {:ng-app "myApp" :lang "en"}
    [:head
     [:meta {:charset "UTF-8"}]
-    [:title "Shiny-like"]
+    [:title "Glow"]
     [:link {:rel "icon"
             :href "data:;base64,iVBORw0KGgo="}]
     [:body
@@ -37,23 +38,19 @@
          :hx-swap "innerhtml"
          :hx-target "#chart"}
         "Slider"]
-       (-> [:select
-            {:name "value"
-             :hx-trigger "change"
-             :hx-post "/api/input"
-             :hx-swap "innerhtml"
-             :hx-target "#chart"}]
-           (into
-            (map (fn [n]
-                   (let [n (float n)]
-                     [:option {:value n} (str n)]))
-                 (range 0.1 1 0.1)))
-           h/html
-           str
-           delay
-           deref)]
+       (into
+        [:select
+         {:name "value"
+          :hx-trigger "change"
+          :hx-post "/api/input"
+          :hx-swap "innerhtml"
+          :hx-target "#chart"}]
+        (map (fn [n]
+               (let [n (float n)]
+                 [:option {:value n} (str n)]))
+             (range 0.1 1 0.1)))]
       [:div#chart
-       ;; TODO: Make this use kind/vega-lite
+       ;; TODO​ Make this use kind/vega-lite
        [:script
         (h/raw (format "vegaEmbed(document.currentScript.parentElement,%s).catch(console.error); "
                        (json/generate-string
@@ -65,4 +62,23 @@
                          "encoding" {"x" {"field" "category"},
                                      "y" {"field" "value", "type" "quantitative"},
                                      "xOffset" {"field" "group"},
-                                     "color" {"field" "group"}}})))]]]]]))
+                                     "color" {"field" "group"}}})))]]]
+     [:div
+      {:style {:display "flex"
+               :justify-content "center"
+               :justify-items "center"}}
+      [:h1 "Histogram"]
+      [:script
+       (h/raw (format "vegaEmbed(document.currentScript.parentElement,%s).catch(console.error); "
+                      (json/generate-string
+                       {"data" {"values" (-> (tc/dataset "./resources/data/faithful.csv")
+                                             (tc/drop-columns ["rownames"])
+                                             (tc/rows :as-maps)
+                                             vec)}
+                        "mark" "bar",
+                        "transform" [{"density" "waiting",
+                                      "bandwidth" 0.3}]
+                        "encoding" {"x" {:field "waiting"
+                                         :bin true},
+                                    "y" {"field" "density"
+                                         "type" "quantitative"}}})))]]]]))
