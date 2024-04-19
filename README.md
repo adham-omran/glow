@@ -29,9 +29,6 @@ TODO
 
 TODO
 
-# Previous Projects
+# Based on Shiny R
 
-Some previous projects that showcase similar features
-
-- [JonyEpsilon/gorilla-repl](https://github.com/JonyEpsilon/gorilla-repl)
-- [benfb/gorilla-repl](https://github.com/benfb/gorilla-repl)
+[Shiny](https://shiny.posit.co/)
