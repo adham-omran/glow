@@ -4,7 +4,8 @@
    [hiccup.page :as page]
    [hiccup2.core :as h]
    [tablecloth.api :as tc]
-   [scicloj.kindly.v4.kind :as kind]))
+   [scicloj.kindly.v4.kind :as kind]
+   [scicloj.clay.v2.item :as item]))
 
 (defn index-page
   []
@@ -23,8 +24,7 @@
      [:div
       {:style {:display "flex"
                :justify-content "center"
-               :align-items "center"
-               }}
+               :align-items "center"}}
       [:div
        [:div
         [:input
@@ -87,17 +87,24 @@
                  rest)))
        [:div
         {:id "chart"}
-        [:script
-         (h/raw (format "vegaEmbed(document.currentScript.parentElement,%s).catch(console.error); "
-                        (json/generate-string
-                         {"data" {"values" (-> (tc/dataset "./resources/data/worldphones.csv")
-                                               (tc/select-columns ["Year" "Mid-Amer"])
-                                               (tc/rows :as-maps)
-                                               vec)}
-                          "mark" "bar",
-                          "encoding" {"x" {:field "Year"},
-                                      "y" {:field "Mid-Amer"
-                                           :type "quantitative"}}})))]]]
-      ]
-
-     ]]))
+        (-> {:value {:data {:values (-> (tc/dataset "./resources/data/worldphones.csv")
+                                        (tc/select-columns ["Year" "Mid-Amer"])
+                                        (tc/rows :as-maps)
+                                        vec)}
+                     :mark :bar,
+                     :encoding {:x {:field "Year"},
+                                :y {:field "Mid-Amer"
+                                    :type :quantitative}}}}
+            item/vega-embed
+            :hiccup)
+        #_[:script
+           (h/raw (format "vegaEmbed(document.currentScript.parentElement,%s).catch(console.error); "
+                          (json/generate-string
+                           {"data" {"values" (-> (tc/dataset "./resources/data/worldphones.csv")
+                                                 (tc/select-columns ["Year" "Mid-Amer"])
+                                                 (tc/rows :as-maps)
+                                                 vec)}
+                            "mark" "bar",
+                            "encoding" {"x" {:field "Year"},
+                                        "y" {:field "Mid-Amer"
+                                             :type "quantitative"}}})))]]]]]]))
