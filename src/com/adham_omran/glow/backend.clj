@@ -41,7 +41,6 @@
        {:post
         {:handler
          (fn [{{:strs [value]} :form-params}]
-           (pprint/pprint value)
            {:body
             (->
              [:script
