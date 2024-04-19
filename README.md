@@ -1,5 +1,5 @@
 An application intended to provide a set of features inspired by
-[Jupyter](https://jupyter.org/) notebook in Clojure.
+[Shiny](https://shiny.posit.co/) in Clojure.
 
 - TODO: Rationale section
 
@@ -28,7 +28,3 @@ TODO
 ## Bugs
 
 TODO
-
-# Based on Shiny R
-
-[Shiny](https://shiny.posit.co/)
