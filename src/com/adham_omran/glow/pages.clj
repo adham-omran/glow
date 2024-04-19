@@ -74,7 +74,7 @@
        (into
         [:select
          {:name "value"
-          :hx-trigger "change"
+          :hx-trigger "load, change"
           :hx-post "/api/world-phones"
           :hx-swap "innerhtml"
           :hx-target "next #chart"}]
@@ -86,25 +86,4 @@
                  tc/column-names
                  rest)))
        [:div
-        {:id "chart"}
-        (-> {:value {:data {:values (-> (tc/dataset "./resources/data/worldphones.csv")
-                                        (tc/select-columns ["Year" "Mid-Amer"])
-                                        (tc/rows :as-maps)
-                                        vec)}
-                     :mark :bar,
-                     :encoding {:x {:field "Year"},
-                                :y {:field "Mid-Amer"
-                                    :type :quantitative}}}}
-            item/vega-embed
-            :hiccup)
-        #_[:script
-           (h/raw (format "vegaEmbed(document.currentScript.parentElement,%s).catch(console.error); "
-                          (json/generate-string
-                           {"data" {"values" (-> (tc/dataset "./resources/data/worldphones.csv")
-                                                 (tc/select-columns ["Year" "Mid-Amer"])
-                                                 (tc/rows :as-maps)
-                                                 vec)}
-                            "mark" "bar",
-                            "encoding" {"x" {:field "Year"},
-                                        "y" {:field "Mid-Amer"
-                                             :type "quantitative"}}})))]]]]]]))
+        {:id "chart"}]]]]]))
