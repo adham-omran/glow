@@ -11,6 +11,7 @@
    [reitit.ring.malli]
    [reitit.ring.middleware.parameters :as parameters]
    [ring.adapter.jetty :as adapter]
+   [scicloj.clay.v2.item :as item]
    [tablecloth.api :as tc]))
 
 (def app
@@ -42,20 +43,20 @@
         {:handler
          (fn [{{:strs [value]} :form-params}]
            {:body
-            (->
-             [:script
-              (h/raw (format "vegaEmbed(document.currentScript.parentElement,%s).catch(console.error); "
-                             (json/generate-string
-                              {"data" {"values" (-> (tc/dataset "./resources/data/worldphones.csv")
-                                                    (tc/select-columns ["Year" value])
-                                                    (tc/rows :as-maps)
-                                                    vec)}
-                               "mark" "bar",
-                               "encoding" {"x" {:field "Year"},
-                                           "y" {:field value
-                                                :type "quantitative"}}})))]
-             h/html
-             str)})}}]]
+            (-> [:script
+                 (h/raw
+                  (second
+                   (second
+                    (:hiccup (item/vega-embed {:value {:data {:values (-> (tc/dataset "./resources/data/worldphones.csv")
+                                                                          (tc/select-columns ["Year" value])
+                                                                          (tc/rows :as-maps)
+                                                                          vec)}
+                                                       :mark :bar,
+                                                       :encoding {:x {:field "Year"},
+                                                                  :y {:field value
+                                                                      :type :quantitative}}}})))))]
+                h/html
+                str)})}}]]
 
      ["/public/*" (ring/create-resource-handler)]]
 
