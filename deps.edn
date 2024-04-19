@@ -12,5 +12,5 @@
                      cider/cider-nrepl             {:mvn/version "0.47.0"}
                      criterium/criterium           {:mvn/version "0.4.6"}}
         :main-opts ["-m" "nrepl.cmdline"
-                    "--port" "9999"
+                    "--port" "9998"
                     "--middleware" "[cider.nrepl/cider-middleware,refactor-nrepl.middleware/wrap-refactor]"]}}}
