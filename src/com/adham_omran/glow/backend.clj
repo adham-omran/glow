@@ -10,7 +10,8 @@
    [reitit.ring.coercion :as coercion]
    [reitit.ring.malli]
    [reitit.ring.middleware.parameters :as parameters]
-   [ring.adapter.jetty :as adapter]))
+   [ring.adapter.jetty :as adapter]
+   [tablecloth.api :as tc]))
 
 (def app
   (ring/ring-handler
@@ -19,8 +20,7 @@
      ["/api"
       ["/input" {:post
                  {:handler
-                  (fn [
-                       {{:strs [value]} :form-params}]
+                  (fn [{{:strs [value]} :form-params}]
                     (pprint/pprint value)
                     {:body
                      (-> [:script
@@ -36,7 +36,27 @@
                                                        "xOffset" {"field" "group"},
                                                        "color" {"field" "group"}}})))]
                          h/html
-                         str)})}}]]
+                         str)})}}]
+      ["/world-phones"
+       {:post
+        {:handler
+         (fn [{{:strs [value]} :form-params}]
+           (pprint/pprint value)
+           {:body
+            (->
+             [:script
+              (h/raw (format "vegaEmbed(document.currentScript.parentElement,%s).catch(console.error); "
+                             (json/generate-string
+                              {"data" {"values" (-> (tc/dataset "./resources/data/worldphones.csv")
+                                                    (tc/select-columns ["Year" value])
+                                                    (tc/rows :as-maps)
+                                                    vec)}
+                               "mark" "bar",
+                               "encoding" {"x" {:field "Year"},
+                                           "y" {:field value
+                                                :type "quantitative"}}})))]
+             h/html
+             str)})}}]]
 
      ["/public/*" (ring/create-resource-handler)]]
 

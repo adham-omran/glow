@@ -23,62 +23,81 @@
      [:div
       {:style {:display "flex"
                :justify-content "center"
-               :justify-items "center"}}
+               :align-items "center"
+               }}
       [:div
-       [:input
-        {:type "range"
-         :id "value"
-         :name "value"
-         :min 0.1
-         :max 1.5
-         :value 0.7
-         :step 0.1
-         :hx-trigger "change"
-         :hx-post "/api/input"
-         :hx-swap "innerhtml"
-         :hx-target "#chart"}
-        "Slider"]
+       [:div
+        [:input
+         {:type "range"
+          :id "value"
+          :name "value"
+          :min 0.1
+          :max 1.5
+          :value 0.7
+          :step 0.1
+          :hx-trigger "change"
+          :hx-post "/api/input"
+          :hx-swap "innerhtml"
+          :hx-target "#chart"}
+         "Slider"]
+        (into
+         [:select
+          {:name "value"
+           :hx-trigger "change"
+           :hx-post "/api/input"
+           :hx-swap "innerhtml"
+           :hx-target "#chart"}]
+         (map (fn [n]
+                (let [n (float n)]
+                  [:option {:value n} (str n)]))
+              (range 0.1 1 0.1)))]
+       [:div#chart
+        ;; TODO​ Make this use kind/vega-lite
+        [:script
+         (h/raw (format "vegaEmbed(document.currentScript.parentElement,%s).catch(console.error); "
+                        (json/generate-string
+                         {"data" {"values" [{"category" "A", "group" "x", "value" 1.0}
+                                            {"category" "B", "group" "z", "value" 1.1}
+                                            {"category" "C", "group" "z", "value" 0.2}]}
+
+                          "mark" "bar",
+                          "encoding" {"x" {"field" "category"},
+                                      "y" {"field" "value", "type" "quantitative"},
+                                      "xOffset" {"field" "group"},
+                                      "color" {"field" "group"}}})))]]]
+      [:div
+       {:style {:display "flex"
+                :justify-content "center"
+                :align-items "center"
+                :flex-direction "column"}}
+       [:h1 "World Phones"]
        (into
         [:select
          {:name "value"
           :hx-trigger "change"
-          :hx-post "/api/input"
+          :hx-post "/api/world-phones"
           :hx-swap "innerhtml"
-          :hx-target "#chart"}]
+          :hx-target "next #chart"}]
         (map (fn [n]
-               (let [n (float n)]
+               (let [n n]
                  [:option {:value n} (str n)]))
-             (range 0.1 1 0.1)))]
-      [:div#chart
-       ;; TODO​ Make this use kind/vega-lite
-       [:script
-        (h/raw (format "vegaEmbed(document.currentScript.parentElement,%s).catch(console.error); "
-                       (json/generate-string
-                        {"data" {"values" [{"category" "A", "group" "x", "value" 1.0}
-                                           {"category" "B", "group" "z", "value" 1.1}
-                                           {"category" "C", "group" "z", "value" 0.2}]}
+             (-> "./resources/data/worldphones.csv"
+                 tc/dataset
+                 tc/column-names
+                 rest)))
+       [:div
+        {:id "chart"}
+        [:script
+         (h/raw (format "vegaEmbed(document.currentScript.parentElement,%s).catch(console.error); "
+                        (json/generate-string
+                         {"data" {"values" (-> (tc/dataset "./resources/data/worldphones.csv")
+                                               (tc/select-columns ["Year" "Mid-Amer"])
+                                               (tc/rows :as-maps)
+                                               vec)}
+                          "mark" "bar",
+                          "encoding" {"x" {:field "Year"},
+                                      "y" {:field "Mid-Amer"
+                                           :type "quantitative"}}})))]]]
+      ]
 
-                         "mark" "bar",
-                         "encoding" {"x" {"field" "category"},
-                                     "y" {"field" "value", "type" "quantitative"},
-                                     "xOffset" {"field" "group"},
-                                     "color" {"field" "group"}}})))]]]
-     [:div
-      {:style {:display "flex"
-               :justify-content "center"
-               :justify-items "center"}}
-      [:h1 "Histogram"]
-      [:script
-       (h/raw (format "vegaEmbed(document.currentScript.parentElement,%s).catch(console.error); "
-                      (json/generate-string
-                       {"data" {"values" (-> (tc/dataset "./resources/data/faithful.csv")
-                                             (tc/drop-columns ["rownames"])
-                                             (tc/rows :as-maps)
-                                             vec)}
-                        "mark" "bar",
-                        "transform" [{"density" "waiting",
-                                      "bandwidth" 0.3}]
-                        "encoding" {"x" {:field "waiting"
-                                         :bin true},
-                                    "y" {"field" "density"
-                                         "type" "quantitative"}}})))]]]]))
+     ]]))
