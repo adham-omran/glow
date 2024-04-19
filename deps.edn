@@ -5,7 +5,8 @@
         ring/ring             {:mvn/version "1.10.0"}
         metosin/reitit        {:mvn/version "0.7.0-alpha7"}
         cheshire/cheshire     {:mvn/version "5.12.0"}
-        org.scicloj/noj       {:mvn/version "1-alpha34"}}
+        org.scicloj/noj       {:mvn/version "1-alpha34"}
+        org.scicloj/clay      {:mvn/version "2-beta7"}}
  :aliases
  {:dev {:extra-deps {nrepl/nrepl                   {:mvn/version "1.1.0"}
                      refactor-nrepl/refactor-nrepl {:mvn/version "3.10.0"}
